@@ -6,12 +6,11 @@ import com.bitz.minegpt.ai.OpenAIProvider;
 import com.bitz.minegpt.ai.AnthropicProvider;
 import com.bitz.minegpt.ai.GoogleProvider;
 import com.bitz.minegpt.ai.OpenRouterProvider;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.math.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +110,7 @@ public class AIChatScreen extends Screen {
 
         closeButton = Button.builder(
             Component.literal("X"),
-            button -> this.close()
+            button -> this.onClose()
         ).bounds(10, 10, 20, 20).build();
         this.addRenderableWidget(closeButton);
 
@@ -291,35 +290,35 @@ public class AIChatScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         graphics.fill(0, 0, this.width, this.height, 0xCC000000);
 
         if (showSettings) {
-            graphics.drawCenteredString(this.font, "MineGPT Settings", this.width / 2, 20, 0xFFFFFF);
+            graphics.centeredText(this.font, "MineGPT Settings", this.width / 2, 20, 0xFFFFFF);
             int startY = 85;
             int x = this.width / 2 - 150;
-            graphics.drawString(this.font, "OpenAI API Key:", x, 85 - 12, 0xAAAAAA, false);
-            graphics.drawString(this.font, "Anthropic API Key:", x, 85 + 35 - 12, 0xAAAAAA, false);
-            graphics.drawString(this.font, "Google API Key:", x, 85 + 70 - 12, 0xAAAAAA, false);
-            graphics.drawString(this.font, "OpenRouter API Key:", x, 85 + 105 - 12, 0xAAAAAA, false);
+            graphics.text(this.font, "OpenAI API Key:", x, 85 - 12, 0xAAAAAA, false);
+            graphics.text(this.font, "Anthropic API Key:", x, 85 + 35 - 12, 0xAAAAAA, false);
+            graphics.text(this.font, "Google API Key:", x, 85 + 70 - 12, 0xAAAAAA, false);
+            graphics.text(this.font, "OpenRouter API Key:", x, 85 + 105 - 12, 0xAAAAAA, false);
         } else {
-            graphics.drawCenteredString(this.font, "MineGPT - " + MineGPTConfig.getInstance().getCurrentModel(), this.width / 2, 20, 0x00FF00);
+            graphics.centeredText(this.font, "MineGPT - " + MineGPTConfig.getInstance().getCurrentModel(), this.width / 2, 20, 0x00FF00);
 
             renderMessages(graphics);
 
             if (isWaitingForResponse) {
-                graphics.drawCenteredString(this.font, "AI is thinking...", this.width / 2, this.height - 60, 0xFFFF00);
+                graphics.centeredText(this.font, "AI is thinking...", this.width / 2, this.height - 60, 0xFFFF00);
             }
         }
 
-        super.render(graphics, mouseX, mouseY, delta);
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
 
         if (showModelDropdown && !showSettings) {
             renderModelDropdown(graphics, mouseX, mouseY);
         }
     }
 
-    private void renderMessages(GuiGraphics graphics) {
+    private void renderMessages(GuiGraphicsExtractor graphics) {
         int startY = 50;
         int maxY = this.height - 50;
         int wrapWidth = this.width - 60;
@@ -351,10 +350,10 @@ public class AIChatScreen extends Screen {
             if (rl.prefixLen > 0) {
                 String prefix = rl.text.substring(0, rl.prefixLen);
                 String rest = rl.text.substring(rl.prefixLen);
-                graphics.drawString(this.font, prefix, 20, y, rl.color, false);
-                graphics.drawString(this.font, rest, 20 + this.font.width(prefix), y, 0xFFFFFFFF, false);
+                graphics.text(this.font, prefix, 20, y, rl.color, false);
+                graphics.text(this.font, rest, 20 + this.font.width(prefix), y, 0xFFFFFFFF, false);
             } else {
-                graphics.drawString(this.font, rl.text, 20, y, 0xFFFFFFFF, false);
+                graphics.text(this.font, rl.text, 20, y, 0xFFFFFFFF, false);
             }
             y += 12;
         }
@@ -381,7 +380,7 @@ public class AIChatScreen extends Screen {
         }
     }
 
-    private void renderModelDropdown(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void renderModelDropdown(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int x = modelDropdownButton.getX();
         int y = modelDropdownButton.getY() - 150;
         int w = 200;
@@ -407,7 +406,7 @@ public class AIChatScreen extends Screen {
 
             int bgColor = hovered ? 0xFF444444 : 0xFF222222;
             graphics.fill(x + 1, y + i * itemHeight + 1, x + w - 1, y + (i + 1) * itemHeight - 1, bgColor);
-            graphics.drawString(this.font, abbreviate(model, 30), x + 4, y + i * itemHeight + 2, 0xFFFFFFFF, false);
+            graphics.text(this.font, abbreviate(model, 30), x + 4, y + i * itemHeight + 2, 0xFFFFFFFF, false);
         }
 
         if (displayModels.size() > maxItems) {
@@ -435,9 +434,9 @@ public class AIChatScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(net.minecraft.client.gui.Click click, boolean isRelease) {
-        double mouseX = click.x();
-        double mouseY = click.y();
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean isRelease) {
+        double mouseX = event.x();
+        double mouseY = event.y();
 
         if (showModelDropdown && !showSettings) {
             int x = modelDropdownButton.getX();
@@ -457,7 +456,7 @@ public class AIChatScreen extends Screen {
             }
         }
 
-        if (super.mouseClicked(click, isRelease)) {
+        if (super.mouseClicked(event, isRelease)) {
             return true;
         }
 
@@ -465,7 +464,7 @@ public class AIChatScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(net.minecraft.client.input.KeyInput input) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent input) {
         if (!showSettings && this.getFocused() == chatInput) {
             if (input.key() == 257 || input.key() == 335) {
                 sendMessage();

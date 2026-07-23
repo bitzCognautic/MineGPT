@@ -4,7 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.minecraft.client.KeyMapping;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
@@ -60,7 +60,7 @@ public class MineGPT implements ClientModInitializer {
             if (openChatKey != null) {
                 while (openChatKey.consumeClick()) pressed = true;
             } else {
-                long window = client.getWindow().getHandle();
+                long window = client.getWindow().handle();
                 if (GLFW.glfwGetKey(window, GLFW.GLFW_KEY_PERIOD) == GLFW.GLFW_PRESS) {
                     if (client.gui.screen() == null) pressed = true;
                 }
@@ -72,7 +72,7 @@ public class MineGPT implements ClientModInitializer {
         });
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(ClientCommandManager.literal("minegpt")
+            dispatcher.register(ClientCommands.literal("minegpt")
                 .executes(context -> {
                     Minecraft client = Minecraft.getInstance();
                     client.execute(() -> {
