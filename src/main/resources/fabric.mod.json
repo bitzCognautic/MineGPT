@@ -1,0 +1,30 @@
+{
+    "schemaVersion": 1,
+    "id": "minegpt",
+    "version": "${version}",
+    "name": "MineGPT",
+    "description": "Bring AI chat directly into Minecraft! Chat with OpenAI, Anthropic, Google, and OpenRouter AI models.",
+    "authors": [
+        "bitz"
+    ],
+    "contact": {
+        "homepage": "https://github.com/bitzCognautic",
+        "sources": "https://github.com/bitzCognautic"
+    },
+    "license": "MIT",
+    "icon": "assets/minegpt/logo.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "com.bitz.minegpt.MineGPT"
+        ]
+    },
+    "mixins": [],
+    "depends": {
+        "fabricloader": ">=0.19.3",
+        "minecraft": "~26.2",
+        "java": ">=25",
+        "fabric-api": "*"
+    },
+    "suggests": {}
+}
