@@ -29,13 +29,16 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Extract mod version
+        run: echo "MOD_VERSION=$(grep '^mod_version' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
+
       - name: Build with Gradle
         run: ./gradlew build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: minegpt-${{ github.sha }}
+          name: minegpt-${{ env.MOD_VERSION }}
           path: build/libs/*.jar
 
   release:
@@ -56,6 +59,9 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x gradlew
+
+      - name: Extract mod version
+        run: echo "MOD_VERSION=$(grep '^mod_version' gradle.properties | cut -d= -f2)" >> "$GITHUB_ENV"
 
       - name: Build with Gradle
         run: ./gradlew build
